@@ -9,20 +9,24 @@ reg [N-1:0] a;
 reg [N-1:0] b;
 reg cin;
 wire [N-1:0] S;
+reg [N-1:0] expected_sum;
 wire cout, Pout, Gout;
-
+integer i;
 initial begin
 
 // write the stimuli conditions
-$monitor("a:%b b:%b cin:%b S:%b cout:%b Pout:%b Gout:%b", a, b, cin, S, cout, Pout, Gout);
-a=232; b=3232; cin=0; #1;
-a=2133; b=1211; cin=0; #1;
-a=1212; b=23232; cin=1; #1;
-
+$monitor("a:%d b:%d cin:%d S:%d expected:%d", a, b, cin, S, expected_sum);
+    for (i = 0; i < 10000; i = i + 1) 
+        begin
+            a = $random;
+            b = $random;
+            cin = $random % 2; 
+            expected_sum= (a+b+cin);
+            #1;
+        end
 end
 
 CLA_32bit dut (.a(a), .b(b), .cin(cin), .sum(S), .cout(cout), .Pout(Pout), .Gout(Gout));
-
 
 initial begin
     $dumpfile("cla_32bit.vcd");
