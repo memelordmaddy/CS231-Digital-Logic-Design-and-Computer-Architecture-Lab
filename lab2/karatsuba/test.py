@@ -1,6 +1,12 @@
+# Python script to compare expected output with given ouput
+# To check the validity run the following commands in order
+# iverilog karatsuba.v tb_karatsuba.v
+# ./a.out > output.txt
+# python3 test.py
 import re
 
 def check_discrepancies(filename):
+    count=0
     with open(filename, 'r') as file:
         lines = file.readlines()
 
@@ -20,9 +26,12 @@ def check_discrepancies(filename):
             if z != expected:
                 all_passed = False
                 print(f"X = {x}, Y = {y}, Z = {z} (Expected: {expected})")
+                count +=1
+                print(count)
 
     if all_passed:
-        print("Success: All test cases passed.")
+        print("All test cases passed.")
+
 
 # Call the function with the path to the output file
 check_discrepancies('output.txt')
