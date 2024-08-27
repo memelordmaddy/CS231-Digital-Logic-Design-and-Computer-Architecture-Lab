@@ -18,7 +18,7 @@ endmodule
 module rca_Nbit #(parameter N = 32) (a, b, cin, S, cout);
     input [N-1:0] a;
     input [N-1:0] b;
-    input [1:0]cin;
+    input cin;
     wire carry[N:0];
     assign carry[0]=cin;
     output wire [N-1:0] S;
@@ -29,6 +29,6 @@ module rca_Nbit #(parameter N = 32) (a, b, cin, S, cout);
             full_adder fi(.a(a[i]), .b(b[i]), .cin(carry[i]), .S(S[i]), .cout(carry[i+1]));
         end
     endgenerate
-    assign cout= carry[N-1];
+    assign cout= carry[N];
 endmodule
 

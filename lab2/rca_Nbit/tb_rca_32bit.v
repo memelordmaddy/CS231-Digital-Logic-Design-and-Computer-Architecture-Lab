@@ -2,12 +2,20 @@
 module tb_rca_32_bit;
 parameter N = 32;
 // declare your signals as reg or wire
-reg[N-1:0] A; reg[N-1:0] B; reg[1:0] cin; wire[N-1:0] S; wire cout;
+integer i;
+reg [N-1:0] expected;
+reg[N-1:0] A; reg[N-1:0] B; reg cin; wire[N-1:0] S; 
+wire cout;
 initial begin	
+$monitor("A:%d, B:%d, cin:%d, Sum:%d, Expected:%d", A, B, cin, S, expected);
 // write the stimuli conditions\
-A= 48; B= 69;  cin= 1'b0; 
-
- $monitor("A:%b B:%b C:%b S:%b cout:%b", A, B,cin, S, cout);
+for(i=0; i<1000; i=i+1) begin
+    A= $random;
+    B=$random;
+    cin= $random%2;
+    expected = A+B+cin;
+    #1;
+end
 end
 rca_Nbit #(32) dut(.a(A), .b(B), .cin(cin), .S(S), .cout(cout));
 
