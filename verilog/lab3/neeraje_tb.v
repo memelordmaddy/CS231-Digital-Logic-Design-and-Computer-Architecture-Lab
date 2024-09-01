@@ -62,8 +62,8 @@ initial begin
 //     #50 rst = 1;
 //         enable = 1'b0;
         
-    for (i=0; i<1; i=i+1) begin
-        for (j=0; j<1; j=j+1) begin
+    for (i=0; i<100; i=i+1) begin
+        for (j=0; j<100; j=j+1) begin
             X = $random%4294967296;
             Y = $random%4294967296;
             //X=i;
@@ -78,7 +78,7 @@ initial begin
             end 
             else begin
 
-                $display("SUCCESS");
+               // $display("SUCCESS");
             end
             #50 rst = 1;
             enable = 1'b0;

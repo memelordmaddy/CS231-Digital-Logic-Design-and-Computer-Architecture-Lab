@@ -1,0 +1,39 @@
+ mult_16 i1(.X(mul_lhs), .Y(mul_rhs), .Z(mul_res));
+
+    
+    assign mul_lhs = (sel_x == 2'b10) ? X[31:16] : 
+                     (sel_x == 2'b01) ? X[15:0] : 
+                     (sel_x == 2'b11) ? ((X[15:0] > X[31:16]) ? (X[15:0] - X[31:16]) : (X[31:16] - X[15:0])) : 
+                     16'b0;
+
+
+    assign mul_rhs = (sel_y == 2'b10) ? Y[31:16] : 
+                     (sel_y == 2'b01) ? Y[15:0] : 
+                     (sel_y == 2'b11) ? ((Y[15:0] > Y[31:16]) ? (Y[15:0] - Y[31:16]) : (Y[31:16] - Y[15:0])) : 
+                     16'b0;
+
+    wire cout;
+    reg[63:0] add_operand;
+    wire[63:0] z_op;
+    adder_Nbit #(64) az(add_operand, Z, 1'b0, z_op, cout);
+    always @(*) begin
+        assign W1= z_op;
+        if (en_z) begin
+            case(sel_z)
+                2'b01: add_operand= {32'b0, mul_res};   // Z += z0
+                2'b10: add_operand= {mul_res, 32'b0};   // Z += z2
+                2'b11: add_operand= {15'b0, T, 16'b0};  // Z += z1
+                default: add_operand={64'b0}; 
+            endcase
+        end else begin
+            W1 = W1;
+        end
+        if (en_T) begin
+        case(sel_T)
+            2'b11: W2 = T + {1'b0, mul_res};  
+            2'b10: W2 = ((X[15:0] > X[31:16]) ^ (Y[15:0] < Y[31:16])) ? (T - {1'b0, mul_res}) : (T + {1'b0, mul_res}); 
+            default: W2 = 33'b0; 
+        endcase
+        end else begin
+        W2 = 33'b0; 
+    end

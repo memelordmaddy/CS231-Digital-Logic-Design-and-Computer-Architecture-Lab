@@ -109,33 +109,41 @@ module iterative_karatsuba_datapath(
                      16'b0;
 
     wire cout;
-    reg[63:0] add_operand;
-    wire[63:0] z_op;
-    adder_Nbit #(64) az(add_operand, Z, 1'b0, z_op, cout);
+    //reg[63:0] add_operand;
+    //wire[63:0] z_op;
+    //adder_Nbit #(64) az(add_operand, Z, 1'b0, z_op, cout);
     always @(*) begin
-        assign W1= z_op;
-        if (en_z) begin
-            case(sel_z)
-                2'b01: add_operand= {32'b0, mul_res};   // Z += z0
-                2'b10: add_operand= {mul_res, 32'b0};   // Z += z2
-                2'b11: add_operand= {15'b0, T, 16'b0};  // Z += z1
-                default: W1 = Z; 
-            endcase
+    if (en_z) begin
+        if (sel_z == 2'b01) begin
+            W1 = Z + {32'b0, mul_res};  // Z += z0
+        end else if (sel_z == 2'b10) begin
+            W1 = Z + {mul_res, 32'b0};  // Z += z2
+        end else if (sel_z == 2'b11) begin
+            W1 = Z + {15'b0, T, 16'b0};  // Z += z1
         end else begin
-            W1 = 64'b0;
+            W1 = Z + {64'b0};  // Default case
         end
-        if (en_T) begin
-        case(sel_T)
-            2'b11: W2 = T + {1'b0, mul_res};  
-            2'b10: W2 = ((X[15:0] > X[31:16]) ^ (Y[15:0] < Y[31:16])) ? (T + {1'b0, mul_res}) : (T - {1'b0, mul_res}); 
-            default: W2 = 33'b0; 
-        endcase
-        end else begin
-        W2 = 33'b0; 
+    end else begin
+        W1 = W1;
     end
 
-   
+    if (en_T) begin
+        if (sel_T == 2'b11) begin
+            W2 = T + {1'b0, mul_res};
+        end else if (sel_T == 2'b10) begin
+            if ((X[15:0] > X[31:16]) ^ (Y[15:0] < Y[31:16])) begin
+                W2 = T - {1'b0, mul_res};
+            end else begin
+                W2 = T + {1'b0, mul_res};
+            end
+        end else begin
+            W2 = T + 33'b0;  // Default case
+        end
+    end else begin
+        W2 = 33'b0;
+    end
 end
+
 
     
 endmodule
@@ -174,57 +182,77 @@ module iterative_karatsuba_control(
     end
     
     always @(*) begin
-       // $display(state);
+    // Default assignments to avoid latches
+    sel_x <= 2'b00;
+    sel_y <= 2'b00;
+    sel_z <= 2'b00;
+    sel_T <= 2'b00;
+    en_T <= 0;
+    en_z <= 0;
+    done <= 0;
+    nxt_state <= S0;
+
     case(state)
         S0: begin
-            sel_x <= 2'b00;
-            sel_y <= 2'b00;
-            sel_z <= 2'b00;
-            sel_T <= 2'b11;
-            en_z <= 1'b0;
-            en_T<=1'b0;
-            done <= 1'b0;
-            nxt_state <= S1;
+            sel_x<=2'b00;
+            sel_y<=2'b00;
+            sel_z<=2'b00;
+            sel_T<=2'b00;
+            en_T<=0;
+            en_z<=0;
+            done<=0;
+            nxt_state<=S1;
         end
         S1: begin
             sel_x <= 2'b10;
             sel_y <= 2'b10;
             sel_z <= 2'b10;
-            en_z <= 1;
-            en_T<=1;
             sel_T <= 2'b11;
+            en_T <= 1;
+            en_z <= 1;
             nxt_state <= S2;
         end
+
         S2: begin
             sel_x <= 2'b01;
             sel_y <= 2'b01;
             sel_z <= 2'b01;
             sel_T <= 2'b11;
-            en_T<=1;
-            en_z <=1;
+            en_T <= 1;
+            en_z <= 1;
             nxt_state <= S3;
         end
+
         S3: begin
             sel_x <= 2'b11;
             sel_y <= 2'b11;
-            sel_z <= 2'b11;
+            sel_z <= 2'b00;
             sel_T <= 2'b10;
-            en_T<=1;
-            en_z <=1;
+            en_T <= 1;
+            en_z <= 1;
             nxt_state <= S4;
         end
+
         S4: begin
-            sel_z <=2'b00;
-            en_z <=1;
-            en_T <=0;
-            done <=1;
-            nxt_state <= S4;
+            sel_z <= 2'b11;
+            en_z <= 1;
+            en_T <= 0;
+            nxt_state <= S5;
         end
+
+        S5: begin
+            done <= 1;
+            en_z <= 0;
+            en_T <= 0;
+            nxt_state <= S5;
+        end
+
         default: begin
             nxt_state <= S0;
         end
     endcase
-    end
+end
+
 
 endmodule
 
