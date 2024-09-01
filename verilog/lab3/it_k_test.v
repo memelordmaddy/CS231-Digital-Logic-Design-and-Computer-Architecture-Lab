@@ -96,32 +96,59 @@ module iterative_karatsuba_datapath(
     
     mult_16 i1(.X(mul_lhs), .Y(mul_rhs), .Z(mul_res));
 
+    wire[15:0] x_sub, x_sub_comp; 
+    wire ov_x, sign_x, c_x;
+    subtract_Nbit #(16) x(X[15:0], X[31:16], 1'b0, x_sub, ov_x, sign_x);
+    Complement2_Nbit #(16) x_com(x_sub, x_sub_comp, c_x);
     
     assign mul_lhs = (sel_x == 2'b10) ? X[31:16] : 
                      (sel_x == 2'b01) ? X[15:0] : 
-                     (sel_x == 2'b11) ? ((X[15:0] > X[31:16]) ? (X[15:0] - X[31:16]) : (X[31:16] - X[15:0])) : 
+                     (sel_x == 2'b11) ? sign_x ? x_sub : x_sub_comp : 
                      16'b0;
 
-
+    wire[15:0] y_sub, y_sub_comp; 
+    wire ov_y, sign_y, c_y;
+    subtract_Nbit #(16) y(Y[15:0], Y[31:16], 1'b0, y_sub, ov_y, sign_y);
+    Complement2_Nbit #(16) y_com(y_sub, y_sub_comp, c_y);
+    
+    assign mul_rhs = (sel_y == 2'b10) ? Y[31:16] : 
+                     (sel_y == 2'b01) ? Y[15:0] : 
+                     (sel_y == 2'b11) ? sign_y ? y_sub : y_sub_comp : 
+                     16'b0;
+    
+/*
     assign mul_rhs = (sel_y == 2'b10) ? Y[31:16] : 
                      (sel_y == 2'b01) ? Y[15:0] : 
                      (sel_y == 2'b11) ? ((Y[15:0] > Y[31:16]) ? (Y[15:0] - Y[31:16]) : (Y[31:16] - Y[15:0])) : 
                      16'b0;
-
+*/
     wire cout;
-    //reg[63:0] add_operand;
-    //wire[63:0] z_op;
-    //adder_Nbit #(64) az(add_operand, Z, 1'b0, z_op, cout);
+    reg[63:0] add_operand;
+    wire[63:0] z_op;
+    adder_Nbit #(64) az(add_operand, Z, 1'b0, z_op, cout);
+
+    wire cout_1;
+    reg[32:0] add_operand_1;
+    wire[32:0] z_op_1;
+    adder_Nbit #(33) az1(add_operand_1, T, 1'b0, z_op_1, cout_1);
+
+    wire cout_comp;
+    reg[32:0] comp_ip;
+    wire[32:0] comp_out;
+    Complement2_Nbit #(33) c1(comp_ip, comp_out, cout_comp);
+
     always @(*) begin
+    assign W1 = z_op;
+    assign W2= z_op_1;
     if (en_z) begin
         if (sel_z == 2'b01) begin
-            W1 = Z + {32'b0, mul_res};  // Z += z0
+            add_operand= {32'b0, mul_res};  // Z += z0
         end else if (sel_z == 2'b10) begin
-            W1 = Z + {mul_res, 32'b0};  // Z += z2
+            add_operand= {mul_res, 32'b0};  // Z += z2
         end else if (sel_z == 2'b11) begin
-            W1 = Z + {15'b0, T, 16'b0};  // Z += z1
+            add_operand=  {15'b0, T, 16'b0};  // Z += z1
         end else begin
-            W1 = Z + {64'b0};  // Default case
+            add_operand=  {64'b0};  
         end
     end else begin
         W1 = W1;
@@ -129,15 +156,16 @@ module iterative_karatsuba_datapath(
 
     if (en_T) begin
         if (sel_T == 2'b11) begin
-            W2 = T + {1'b0, mul_res};
+            add_operand_1= {1'b0, mul_res};
         end else if (sel_T == 2'b10) begin
-            if ((X[15:0] > X[31:16]) ^ (Y[15:0] < Y[31:16])) begin
-                W2 = T - {1'b0, mul_res};
+            if (sign_x ^ !sign_y) begin
+                comp_ip = {1'b0, mul_res};
+                add_operand_1 = comp_out;
             end else begin
-                W2 = T + {1'b0, mul_res};
+                add_operand_1= {1'b0, mul_res};
             end
         end else begin
-            W2 = T + 33'b0;  // Default case
+            add_operand_1= 33'b0;  
         end
     end else begin
         W2 = 33'b0;
