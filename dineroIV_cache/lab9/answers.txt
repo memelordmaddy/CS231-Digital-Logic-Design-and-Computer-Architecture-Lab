@@ -1,0 +1,17 @@
+Q1:
+use the command ./dineroIV -l1-usize 4k  -l1-ubsize 16 -l1-uccc -l1-uwalloc a -l1-uwback a -maxcount [insert value] -informat d < ../tex.din
+untill the fraction of compulsary miss change from 1 to <1
+
+cc1:225
+spice:2072
+tex:82
+
+Q2:
+As cache size increases miss rate decreases
+
+Q3:
+There exist a minima for block size vs miss rate curve
+
+Q4:
+Plot gradually tends to a value as assosiativity increases
+

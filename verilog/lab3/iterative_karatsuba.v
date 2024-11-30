@@ -92,13 +92,13 @@ module iterative_karatsuba_datapath(clk, rst, X, Y, T, Z, sel_x, sel_y, en_z, se
                     en_z <= 1'b1;
             2'b11: W1<= Z + {31'b0, T, 32'b0};
                     en_z<= 1'b1;
-            2'b00:  en_z<=0; 
+            2'b00: en_z<=0; 
         endcase
         
         case(en_T)
             2'b11: W2<= T + {1'b0,mul_res};
                     en_T <=1'b1;
-            2'b00: en_T <= 1'b0
+            2'b00: 
             2'b01:
             2'b10:
         endcase
@@ -145,40 +145,6 @@ module iterative_karatsuba_control(clk,rst, enable, sel_x, sel_y, sel_z, sel_T, 
 
     always@(*) begin
         case(state) 
-            S1: 
-                begin
-                    nxt_state <= S2;
-                    sel_x <= 2'b01;
-                    sel_y <= 2'b01;
-                    sel_z <= 2'b01;
-                    sel_T <= 2'b11;
-                end
-			S2: 
-                begin
-                    nxt_state <= S3;
-                    sel_x <= 2'b10;
-                    sel_y <= 2'b10;
-                    sel_z <= 2'b10;
-                    sel_T <= 2'b11;
-                end
-            S3: 
-                begin
-                    nxt_state <= S4;
-                    sel_x <= 2'b11;
-                    sel_y <= 2'b11;
-                    sel_z <= 2'b11;
-                    sel_T <= 2'b11;
-                end
-            S4: localparams
-                begin
-                    nxt_state <= S5;
-                    sel_x <= 2'b00;
-                    sel_y <= 2'b00;
-                    sel_z <= 2'b00;
-                    sel_T <= 2'b00;
-                    done <= 1'b1
-                end
-
             S0: 
                 begin
                     nxt_state <= S1;
@@ -186,7 +152,48 @@ module iterative_karatsuba_control(clk,rst, enable, sel_x, sel_y, sel_z, sel_T, 
                     sel_y <= 2'b00;
                     sel_z <= 2'b00;
                     sel_T <= 2'b00;
-                    done <= 1'b0;
+                end
+			S1: 
+                begin
+                    nxt_state <= S2;
+                    sel_x <= 2'b01;
+                    sel_y <= 2'b01;
+                    sel_z <= 2'b01;
+                    sel_T <= 2'b00;
+                end
+            S2: 
+                begin
+                    nxt_state <= S3;
+                    sel_x <= 2'b10;
+                    sel_y <= 2'b10;
+                    sel_z <= 2'b10;
+                    sel_T <= 2'b00;
+                end
+            S3: 
+                begin
+                    nxt_state <= S4;
+                    sel_x <= 2'b11;
+                    sel_y <= 2'b11;
+                    sel_z <= 2'b00;
+                    sel_T <= 2'b00;
+                end
+            S4: 
+                begin
+                    nxt_state <= S5;
+                    sel_x <= 2'b00;
+                    sel_y <= 2'b00;
+                    sel_z <= 2'b00;
+                    sel_T <= 2'b00;
+                end
+
+            S5: 
+                begin
+                    nxt_state <= S0;
+                    sel_x <= 2'b00;
+                    sel_y <= 2'b00;
+                    sel_z <= 2'b00;
+                    sel_T <= 2'b00;
+                    done <= 1'b1;
                 end
             default: 
                 begin

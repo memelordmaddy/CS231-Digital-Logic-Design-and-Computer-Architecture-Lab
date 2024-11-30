@@ -1,0 +1,2 @@
+stack is at its max height when the value is not in the array
+at max depth the stack contains multiple return addresses caused by multiple recursive calls

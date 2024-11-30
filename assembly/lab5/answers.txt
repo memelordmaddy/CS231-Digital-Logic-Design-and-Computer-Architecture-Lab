@@ -1,0 +1,28 @@
+add.s 
+
+$v0 = 5 sets to reading an input intger
+$v0=1 sets to ouputing an integer
+----------------------------------------
+
+add-prompt.s
+
+$v0=4 prints string
+I declared three strings as global data in .data section and now i'm using it by loading it inside $a0
+----------------------------------------------------------------------------------------------------------
+
+aDeclare.s
+
+align make sure memory in between is not accessed 
+without we might access stuff that is not suppossed to be accessed
+
+---------------------------
+
+numLessThan.s
+
+demo
+
+the hardest part was dealing with dereferencing and trying to do stuff with limityed number of argumnets
+
+
+
+

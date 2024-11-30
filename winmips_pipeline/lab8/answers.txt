@@ -1,0 +1,17 @@
+1: 
+with data forwarding : 173 cycles
+without data forwarding: 216 cycles
+
+2:
+with data forwarding : 169 cycles
+without data forwarding: 219 cycles
+
+3:
+after scheduling 163 cycles
+
+4:
+after unrolling 160 cycles
+
+5:
+after scheduling and unrolling 115
+

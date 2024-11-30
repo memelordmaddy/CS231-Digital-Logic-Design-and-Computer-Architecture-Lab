@@ -1,6 +1,0 @@
-COMBINATIONAL ALWAYS BLOCK
-always @ (input_1 or input_2)
-  begin
-    and_gate = input_1 & input_2;
-  end
-This executes when either input 1 or input 2 is changed

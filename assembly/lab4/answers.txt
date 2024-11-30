@@ -1,0 +1,55 @@
+Q1
+
+FR regs contains registers for storing floating point values and double 
+nt Regs contains regsiter that we use in code such as s0, s1, .., t0, t1, .., ra, v0, a0, ...
+Data: don't know , hexcodes looks like memory addresses (i think this represents the .data part)
+Text: don't know, again the hexcodes looks like memory addresses (this represents the .text part )
+
+Q2 
+
+[00400000] 8fa40000  lw $4, 0($29)            ; 183: lw $a0 0($sp) # argc 
+
+[00400000] represents the address of the first of my program
+
+Q3
+
+ori $2, $0, 1  is the translated version of "li $v0, 1"
+
+Q4
+
+[00400024] 20080001  addi $8, $0, 1           ; 4: addi $t0, $zero, 1 
+[00400028] 20090002  addi $9, $0, 2           ; 5: addi $t1, $zero, 2 
+[0040002c] 01098020  add $16, $8, $9          ; 6: add $s0, $t0, $t1 
+[00400030] 34020001  ori $2, $0, 1            ; 7: li $v0, 1 
+[00400034] 00102021  addu $4, $0, $16         ; 8: move $a0, $s0 
+[00400038] 0000000c  syscall                  ; 9: syscall 
+[0040003c] 3402000a  ori $2, $0, 10           ; 11: li $v0, 10 
+[00400040] 0000000c  syscall                  ; 13: syscall 
+
+the second column represents the machine code part of my code
+
+for op code 
+consider 20080... convert to binary 0010 0000 ,... op code will be 001000
+similary you can do the same for other machine codes
+
+Q5 
+
+demo to ta regarding running the program
+
+Q6
+
+use the button next to run button (one with numbers n all) to step through the program to see your code getting executed line by line 
+demo to ta
+
+Q7 
+
+rigth click on text part (in spim) to set break points
+
+Q8
+
+use lui, ori
+demo to ta
+
+Q9
+
+demo to ta

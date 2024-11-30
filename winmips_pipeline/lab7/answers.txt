@@ -1,0 +1,6 @@
+1) By default it assumes that the branch is not taken, since it autmatically loads 'sd r31,(r29)' instruction after the bnez instruction
+There is an option to configure branch target buffer in WinMIPs
+
+2) Branch instruction require its input in the EX stage to subtract the two values present in registers and set zero?
+
+3) 
